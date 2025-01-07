@@ -1,0 +1,58 @@
+/* styles/Home.module.css */
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #ffeb3b;
+    color: #000;
+  }
+  
+  .title {
+    font-size: 4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .description {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+  }
+  
+  .button {
+    margin-top: 2rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    background-color: #000;
+    color: #ffeb3b;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .button:hover {
+    background-color: #333;
+  }
+  
+  /* ローディング用スピナー */
+  .spinner {
+    margin-top: 2rem;
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3; /* 背景の薄い色 */
+    border-top: 5px solid #000; /* スピナーの濃い色 */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* スピナーの回転アニメーション */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
