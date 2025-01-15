@@ -22,9 +22,9 @@ RUN apt-get update && apt-get upgrade -y \
 ENV CUDA_DOCKER_ARCH=all
 ENV GGML_CUDA=1
 
-# HOSTをCloud Runに適した設定に変更
+# HOSTをCloud Runに適した設定に変更, Cloud Runでは8080ポートがデフォルト
 ENV HOST 0.0.0.0
-ENV PORT 8080  # Cloud Runでは8080ポートがデフォルト
+ENV PORT 8080
 
 # 必要なコードをコンテナにコピー
 COPY . .

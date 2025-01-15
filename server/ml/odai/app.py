@@ -1,4 +1,5 @@
 import os
+import json
 import random
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -15,16 +16,16 @@ load_dotenv()
 app = FastAPI()
 
 # GCS 設定
-PROJECT_ID = os.getenv("GCP_PROJECT_ID")
-BUCKET_NAME = os.getenv("GCS_BUCKET_NAME")
-LOCAL_MODEL_DIR = os.getenv("LOCAL_MODEL_DIR")
+PROJECT_ID = "ogirin-prod"
+BUCKET_NAME = "ogirin-model"
+LOCAL_MODEL_DIR = "/tmp/models"
 
-GCS_BASE_MODEL_PATH = os.getenv("GCS_BASE_MODEL_PATH")
+GCS_BASE_MODEL_PATH = "generator/base/base-odai.gguf"
 LOCAL_BASE_MODEL_PATH = os.path.join(LOCAL_MODEL_DIR, "base.gguf")
-GCS_LORA_MODEL_PATH = os.getenv("GCS_LORA_MODEL_PATH")
+GCS_LORA_MODEL_PATH = "generator/odai/lora-odai.gguf"
 LOCAL_LORA_MODEL_PATH = os.path.join(LOCAL_MODEL_DIR, "lora.gguf")
 
-KEY_PATH = os.getenv("GCS_KEY_PATH")
+GCP_SA_KEY = json.loads(os.getenv("GCP_SA_KEY"))
 
 # モデル変数（後で初期化）
 model = None
@@ -34,7 +35,7 @@ def download_model_from_gcs():
     if not os.path.exists(LOCAL_MODEL_DIR):
         os.makedirs(LOCAL_MODEL_DIR)  # ディレクトリがなければ作成
         
-    credential = service_account.Credentials.from_service_account_file(KEY_PATH)
+    credential = service_account.Credentials.from_service_account_info(GCP_SA_KEY)
     client = storage.Client(project=PROJECT_ID, credentials=credential)
     bucket = client.bucket(BUCKET_NAME)
     
@@ -97,5 +98,3 @@ def generate_by_llm(request: MessageRequest):
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-# uvicorn src.app_gcs:app --host 127.0.0.1 --port 8007
