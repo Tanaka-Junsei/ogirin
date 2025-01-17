@@ -107,6 +107,7 @@ def generate_odai(number: int) -> str:
     
     return odai_list
 
+# supabase へのアップロード関数
 def upload_to_supabase(data: List[str]) -> None:
     supabase.table("odai").insert(data).execute()
 
