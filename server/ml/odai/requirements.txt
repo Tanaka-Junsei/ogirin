@@ -1,3 +1,4 @@
 pydantic
 google-cloud-storage
 python-dotenv
+supabase

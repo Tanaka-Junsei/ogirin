@@ -1,13 +1,14 @@
 import os
 import json
 import random
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from llama_cpp import Llama
 from typing import List
 from google.cloud import storage
 from google.oauth2 import service_account
 from dotenv import load_dotenv
+from supabase import create_client
 
 # .env ファイルをロード
 load_dotenv()
@@ -15,7 +16,7 @@ load_dotenv()
 # FastAPI アプリケーションの初期化
 app = FastAPI()
 
-# GCS 設定
+# GCP 設定
 PROJECT_ID = "ogirin-prod"
 BUCKET_NAME = "ogirin-model"
 LOCAL_MODEL_DIR = "/tmp/models"
@@ -26,6 +27,9 @@ GCS_LORA_MODEL_PATH = "generator/odai/lora-odai.gguf"
 LOCAL_LORA_MODEL_PATH = os.path.join(LOCAL_MODEL_DIR, "lora.gguf")
 
 GCP_SA_KEY = json.loads(os.getenv("GCP_SA_KEY"))
+
+# Supabase 設定
+supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 # モデル変数（後で初期化）
 model = None
@@ -88,7 +92,7 @@ def generate_odai(number: int) -> str:
     formatted_messages = [{"role": "user", "content": prompt}]
 
     # モデルに渡す
-    responses = []
+    odai_list = []
     while True:
         response = model.create_chat_completion(
             messages=formatted_messages, 
@@ -97,17 +101,21 @@ def generate_odai(number: int) -> str:
         )
         content = response["choices"][0]["message"]["content"]
         if "大喜利" not in content:
-            responses.append(content)
-        if len(responses) == number:
+            odai_list.append({"text": content})
+        if len(odai_list) == number:
             break
     
-    return responses
+    return odai_list
+
+def upload_to_supabase(data: List[str]) -> None:
+    supabase.table("odai").insert(data).execute()
 
 # 推論エンドポイント
-@app.post("/generate_odai_endpoint")
-def generate_odai_endpoint(request: Request):
+@app.post("/reload_odai/", status_code=status.HTTP_201_CREATED)
+def reload_odai(request: Request) -> dict:
     try:
-        responses = generate_odai(request.number)
-        return {"response": responses}
+        odai_list = generate_odai(request.number)
+        upload_to_supabase(odai_list)
+        return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
