@@ -30,6 +30,15 @@ GCP_SA_KEY = json.loads(os.getenv("GCP_SA_KEY"))
 # モデル変数（後で初期化）
 model = None
 
+# プロンプトの準備
+prompt = """
+
+### 指示:
+大喜利のお題を作成してください。
+
+### 応答:
+"""
+
 # GCS からモデルをダウンロードする関数
 def download_model_from_gcs():
     if not os.path.exists(LOCAL_MODEL_DIR):
@@ -70,31 +79,35 @@ def load_model():
     print("Model loaded successfully.")
 
 # リクエストボディのスキーマ定義
-class Message(BaseModel):
-    role: str  # "user" または "assistant"
-    content: str
-
-class MessageRequest(BaseModel):
-    messages: List[Message]  # 会話履歴のリスト
+class Request(BaseModel):
+    number: int # 生成する応答の数
 
 # 応答取得関数
-def get_response_from_llm(messages: List[Message]) -> str:
+def generate_odai(number: int) -> str:
     # モデル用の入力形式に変換
-    formatted_messages = [{"role": msg.role, "content": msg.content} for msg in messages]
+    formatted_messages = [{"role": "user", "content": prompt}]
 
     # モデルに渡す
-    response = model.create_chat_completion(
-        messages=formatted_messages, 
-        max_tokens=100, 
-        temperature=1.2,
-    )
-    return response["choices"][0]["message"]["content"]
+    responses = []
+    while True:
+        response = model.create_chat_completion(
+            messages=formatted_messages, 
+            max_tokens=100, 
+            temperature=1.2,
+        )
+        content = response["choices"][0]["message"]["content"]
+        if "大喜利" not in content:
+            responses.append(content)
+        if len(responses) == number:
+            break
+    
+    return responses
 
 # 推論エンドポイント
-@app.post("/generate_by_llm")
-def generate_by_llm(request: MessageRequest):
+@app.post("/generate_odai_endpoint")
+def generate_odai_endpoint(request: Request):
     try:
-        response = get_response_from_llm(request.messages)
-        return {"response": response}
+        responses = generate_odai(request.number)
+        return {"response": responses}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
