@@ -2,6 +2,8 @@ name: Deploy to Cloud Run
 
 on:
   push:
+    branches:
+      - 'cloud-run-odai'  # cloud-run-odaiブランチの変更時にトリガー
     paths:
       - 'server/ml/odai/**'  # 特定ディレクトリに変更があった場合のみトリガー
 
