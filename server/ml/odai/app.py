@@ -88,10 +88,8 @@ class Request(BaseModel):
 
 # 応答取得関数
 def generate_odai(number: int) -> str:
-    # モデル用の入力形式に変換
-    formatted_messages = [{"role": "user", "content": prompt}]
+    formatted_messages = [{"role": "user", "content": prompt}] # モデル用の入力形式に変換
 
-    # モデルに渡す
     odai_list = []
     while True:
         response = model.create_chat_completion(
