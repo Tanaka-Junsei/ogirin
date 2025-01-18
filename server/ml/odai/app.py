@@ -35,7 +35,7 @@ supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 model = None
 
 # プロンプトの準備
-prompt = """
+PROMPT = """
 
 ### 指示:
 大喜利のお題を作成してください。
@@ -88,7 +88,7 @@ class Request(BaseModel):
 
 # 応答取得関数
 def generate_odai(number: int) -> str:
-    formatted_messages = [{"role": "user", "content": prompt}] # モデル用の入力形式に変換
+    formatted_messages = [{"role": "user", "content": PROMPT}] # モデル用の入力形式に変換
 
     odai_list = []
     while True:
