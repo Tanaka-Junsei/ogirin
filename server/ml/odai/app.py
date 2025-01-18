@@ -44,7 +44,7 @@ PROMPT = """
 """
 
 # GCS からモデルをダウンロードする関数
-def download_model_from_gcs():
+def download_model_from_gcs() -> None:
     if not os.path.exists(LOCAL_MODEL_DIR):
         os.makedirs(LOCAL_MODEL_DIR)  # ディレクトリがなければ作成
         
