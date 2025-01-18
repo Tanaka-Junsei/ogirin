@@ -69,11 +69,11 @@ def download_model_from_gcs():
 # FastAPI のイベントでモデルをロード
 @app.on_event("startup")
 def load_model():
-    global model
     # モデルをダウンロード
     download_model_from_gcs()
 
     # モデルをロード
+    global model
     model = Llama(
         model_path=LOCAL_BASE_MODEL_PATH,
         lora_path=LOCAL_LORA_MODEL_PATH,
