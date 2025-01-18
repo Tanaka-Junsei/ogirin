@@ -31,14 +31,10 @@ COPY . .
 
 # 依存関係をインストール
 RUN python3 -m pip install --upgrade pip \
-    && pip install pytest cmake scikit-build setuptools \
-    && pip install fastapi uvicorn sse-starlette pydantic-settings starlette-context
+    && pip install -r requirements.txt
 
 # llama-cpp-pythonをCUDA対応でアーキテクチャ指定してインストール
 RUN CMAKE_ARGS="-DGGML_CUDA=on -DCMAKE_CUDA_ARCHITECTURES=86" pip install llama-cpp-python
-
-# requirements.txtでllama-cpp-pythonと関係のないパッケージをインストール
-RUN python3 -m pip install -r requirements.txt
 
 # 必要なポートを公開
 EXPOSE 8080
