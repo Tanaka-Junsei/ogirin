@@ -9,11 +9,13 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-22.04  # 明示的にUbuntuバージョンを指定
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # 完全な履歴を取得
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v1
@@ -28,11 +30,4 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image ./odai
-
-    - name: Deploy to Cloud Run
-      run: |
-        gcloud run deploy odai-service \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
-            --region ${{ secrets.GCP_REGION }} \
-            --allow-unauthenticated
+        gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image ./server/ml/odai
