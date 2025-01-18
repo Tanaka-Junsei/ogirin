@@ -1,4 +1,4 @@
-# NVIDIAのCUDA 12.4.1ベースの開発用Ubuntuイメージを使用
+# NVIDIAのCUDA 12.4.1ベースのイメージを使用
 ARG CUDA_IMAGE="12.4.1-runtime-ubuntu22.04"
 FROM nvidia/cuda:${CUDA_IMAGE}
 
@@ -12,7 +12,7 @@ WORKDIR /app
 # 必要なパッケージのインストール
 RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y git build-essential \
-    python3 python3-pip gcc wget curl \
+    python3 python3-pip gcc wget \
     ocl-icd-opencl-dev opencl-headers clinfo \
     libclblast-dev libopenblas-dev \
     && mkdir -p /etc/OpenCL/vendors && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd \
