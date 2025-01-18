@@ -115,6 +115,6 @@ def reload_odai(request: Request) -> dict:
     try:
         odai_list = generate_odai(request.number)
         upload_to_supabase(odai_list)
-        return {"message": f"Successfully reloaded {request.number} odai."}
+        return {"message": f"Successfully reloaded {request.number} odai to Supabase."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
