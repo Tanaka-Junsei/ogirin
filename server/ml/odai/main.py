@@ -34,7 +34,7 @@ supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 # モデル変数（後で初期化）
 model = None
 
-# プロンプト設定
+# プロンプトの設定
 PROMPT = """
 
 ### 指示:
