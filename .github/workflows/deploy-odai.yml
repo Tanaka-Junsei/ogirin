@@ -40,5 +40,5 @@ jobs:
           --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated \
-          --timeout=1800s \
+          --timeout=3600s \
           --max-instances=1 
