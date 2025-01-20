@@ -14,8 +14,8 @@
 ```mermaid
 
 flowchart TB
-  node_1["VM"]
-  node_2["Supabase\nPostgres\nDatabase"]
+  node_1["Cloud Run"]
+  node_2["Supabase"]
   node_3["Vercel"]
   node_1 --"生成されたお題を投入"--> node_2
   node_2 --"お題を取得"--> node_3
@@ -24,13 +24,14 @@ flowchart TB
 
 ## 詳細
 
-### VM
-
+### Cloud Run
+- FastAPIで実装
+- LLMが生成したお題をSupabaseに投入
 
 ### Supabase
-- Postgres　Databaseでお題を管理
+- PostgreSQL Databaseでお題を管理
 - 認証機能は随時実装予定
 
 ### Vercel
-- Nextjsで実装
+- Next.jsで実装
 - お題の残り件数が足りなくなった時点でAPIを呼び出し
