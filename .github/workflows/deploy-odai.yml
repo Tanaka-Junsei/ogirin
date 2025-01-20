@@ -25,6 +25,7 @@ jobs:
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         install_components: gcloud
+        version: latest
 
     - name: Build and push Docker image
       run: |
