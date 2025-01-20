@@ -41,4 +41,5 @@ jobs:
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated \
           --timeout=3600s \
-          --max-instances=1 
+          --max-instances=1 \
+          --update-secrets=GCP_SA_KEY=GCP_SA_KEY:latest,SUPABASE_URL=SUPABASE_URL:latest,SUPABASE_KEY=SUPABASE_KEY:latest
