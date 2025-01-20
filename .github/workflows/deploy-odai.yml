@@ -31,11 +31,13 @@ jobs:
         gcloud builds submit \
           --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
           ./server/ml/odai \
-          --no-stream
+          --no-log-http
 
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy odai-service \
             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
             --region ${{ secrets.GCP_REGION }} \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --timeout=1800s \ 
+            --max-instances=1 
