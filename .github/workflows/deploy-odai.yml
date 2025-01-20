@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 on:
   push:
     branches:
-      - 'cloud-run-odai'
+      - 'main'
     paths:
       - 'server/ml/odai/**'
 
