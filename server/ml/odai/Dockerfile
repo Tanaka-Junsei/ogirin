@@ -1,5 +1,5 @@
 # NVIDIAのCUDA 12.4.1ベースのイメージを使用
-ARG CUDA_IMAGE="12.4.1-runtime-ubuntu22.04"
+ARG CUDA_IMAGE="12.4.1-devel-ubuntu22.04"
 FROM nvidia/cuda:${CUDA_IMAGE}
 
 # タイムゾーンの設定
