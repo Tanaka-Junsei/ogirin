@@ -1,0 +1,47 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'server/ml/odai/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Setup Google Cloud CLI
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        install_components: gcloud
+        version: latest
+
+    - name: Build and push Docker image
+      run: |
+        gcloud builds submit \
+          --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
+          ./server/ml/odai \
+          --gcs-log-dir=gs://ogirin-build-logs
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy odai-service \
+          --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
+          --region ${{ secrets.GCP_REGION }} \
+          --allow-unauthenticated \
+          --timeout=3600s \
+          --max-instances=1 \
+          --memory=8Gi \
+          --cpu=2 \
+          --update-secrets=GCP_SA_KEY=GCP_SA_KEY:latest,SUPABASE_URL=SUPABASE_URL:latest,SUPABASE_KEY=SUPABASE_KEY:latest

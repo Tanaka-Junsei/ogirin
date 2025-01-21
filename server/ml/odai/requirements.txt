@@ -1,0 +1,15 @@
+pytest 
+cmake 
+scikit-build 
+setuptools
+fastapi 
+uvicorn 
+sse-starlette 
+pydantic-settings 
+starlette-context
+
+pydantic
+google-cloud-storage
+google-auth
+python-dotenv
+supabase
