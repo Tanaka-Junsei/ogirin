@@ -42,6 +42,6 @@ jobs:
           --allow-unauthenticated \
           --timeout=3600s \
           --max-instances=1 \
-          --memory=8Gi \
-          --cpu=4 \
+          --memory=16Gi \
+          --cpu=6 \
           --update-secrets=GCP_SA_KEY=GCP_SA_KEY:latest
