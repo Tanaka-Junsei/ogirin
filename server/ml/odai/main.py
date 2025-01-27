@@ -21,9 +21,9 @@ PROJECT_ID = "ogirin-prod"
 BUCKET_NAME = "ogirin-model"
 LOCAL_MODEL_DIR = "/tmp/models"
 
-GCS_BASE_MODEL_PATH = "generator/base/base-odai.gguf"
+GCS_BASE_MODEL_PATH = "generator/base/3.7b.gguf"
 LOCAL_BASE_MODEL_PATH = os.path.join(LOCAL_MODEL_DIR, "base.gguf")
-GCS_LORA_MODEL_PATH = "generator/odai/lora-odai.gguf"
+GCS_LORA_MODEL_PATH = "generator/lora/3.7b-odai.gguf"
 LOCAL_LORA_MODEL_PATH = os.path.join(LOCAL_MODEL_DIR, "lora.gguf")
 
 GCP_SA_KEY = json.loads(os.getenv("GCP_SA_KEY"))
