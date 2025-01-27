@@ -30,7 +30,7 @@ GCP_SA_KEY = json.loads(os.getenv("GCP_SA_KEY"))
 # モデル変数（後で初期化）
 model = None
 
-# プロンプトの設定
+# プロンプト設定
 PROMPT = """
 
 ### 指示:
