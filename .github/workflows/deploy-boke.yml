@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'server/ml/odai/**'
+      - 'server/ml/boke/**'
 
 jobs:
   deploy:
@@ -30,18 +30,18 @@ jobs:
     - name: Build and push Docker image
       run: |
         gcloud builds submit \
-          --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
-          ./server/ml/odai \
+          --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/boke-app-image \
+          ./server/ml/boke \
           --gcs-log-dir=gs://ogirin-build-logs
 
     - name: Deploy to Cloud Run
       run: |
-        gcloud run deploy odai-service \
-          --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
+        gcloud run deploy boke-service \
+          --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/boke-app-image \
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated \
           --timeout=3600s \
           --max-instances=1 \
-          --memory=8Gi \
-          --cpu=2 \
+          --memory=24Gi \
+          --cpu=8 \
           --update-secrets=GCP_SA_KEY=GCP_SA_KEY:latest

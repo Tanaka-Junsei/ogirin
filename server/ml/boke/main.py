@@ -19,9 +19,9 @@ PROJECT_ID = "ogirin-prod"
 BUCKET_NAME = "ogirin-model"
 LOCAL_MODEL_DIR = "/tmp/models"
 
-GCS_BASE_MODEL_PATH = "generator/base/3.7b.gguf"
+GCS_BASE_MODEL_PATH = "generator/base/13b.gguf"
 LOCAL_BASE_MODEL_PATH = os.path.join(LOCAL_MODEL_DIR, "base.gguf")
-GCS_LORA_MODEL_PATH = "generator/lora/3.7b-odai.gguf"
+GCS_LORA_MODEL_PATH = "generator/lora/13b-boke.gguf"
 LOCAL_LORA_MODEL_PATH = os.path.join(LOCAL_MODEL_DIR, "lora.gguf")
 
 GCP_SA_KEY = json.loads(os.getenv("GCP_SA_KEY"))
@@ -29,11 +29,14 @@ GCP_SA_KEY = json.loads(os.getenv("GCP_SA_KEY"))
 # モデル変数（後で初期化）
 model = None
 
-# プロンプトの設定
+# プロンプト設定
 PROMPT = """
 
 ### 指示:
-大喜利のお題を作成してください。
+大喜利のお題に答えてください。
+
+### お題:
+{odai}
 
 ### 応答:
 """
@@ -80,12 +83,13 @@ def load_model():
 # リクエストボディのスキーマ定義
 class Request(BaseModel):
     number: int # 生成する応答の数
+    odai: str
 
 # 応答取得関数
-def generate_odai(number: int) -> List[str]:
-    formatted_messages = [{"role": "user", "content": PROMPT}] # モデル用の入力形式に変換
+def generate_boke(number: int, odai: str) -> List[str]:
+    formatted_messages = [{"role": "user", "content": PROMPT.format(odai=odai)}] # モデル用の入力形式に変換
 
-    odai_list = []
+    boke_list = []
     for _ in range(number):
         response = model.create_chat_completion(
             messages=formatted_messages, 
@@ -93,15 +97,15 @@ def generate_odai(number: int) -> List[str]:
             temperature=1.2,
         )
         content = response["choices"][0]["message"]["content"]
-        odai_list.append(content)
+        boke_list.append(content)
     
-    return odai_list
+    return boke_list
 
 # 推論エンドポイント
-@app.post("/odai_endpoint", status_code=status.HTTP_201_CREATED)
-def odai_endpoint(request: Request) -> dict:
+@app.post("/boke_endpoint", status_code=status.HTTP_201_CREATED)
+def boke_endpoint(request: Request) -> dict:
     try:
-        odai_list = generate_odai(request.number)
-        return {"response": odai_list}
+        boke_list = generate_boke(request.number, request.odai)
+        return {"response": boke_list}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
