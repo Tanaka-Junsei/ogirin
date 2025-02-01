@@ -21,7 +21,7 @@ flowchart TB
   node_2 --"生成リクエストを送信"--> node_1
   node_1 --"お題を生成"--> node_2
   node_2 --"DBにお題を登録"--> node_3
-  node_4 --"お題を取得"--> node_3
+  node_4 --"お題を取得"--> node_2
 ```
 
 ## 詳細
