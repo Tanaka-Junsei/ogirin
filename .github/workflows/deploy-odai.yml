@@ -44,4 +44,4 @@ jobs:
           --max-instances=1 \
           --memory=8Gi \
           --cpu=2 \
-          --update-secrets=GCP_SA_KEY=GCP_SA_KEY:latest,SUPABASE_URL=SUPABASE_URL:latest,SUPABASE_KEY=SUPABASE_KEY:latest
+          --update-secrets=GCP_SA_KEY=GCP_SA_KEY:latest

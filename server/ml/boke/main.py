@@ -1,6 +1,5 @@
 import os
 import json
-import random
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from llama_cpp import Llama
@@ -38,6 +37,8 @@ PROMPT = """
 
 ### お題:
 {odai}
+
+### 応答:
 """
 
 # GCS からモデルをダウンロードする関数
@@ -85,7 +86,7 @@ class Request(BaseModel):
     odai: str
 
 # 応答取得関数
-def generate_boke(number: int, odai: str) -> str:
+def generate_boke(number: int, odai: str) -> List[str]:
     formatted_messages = [{"role": "user", "content": PROMPT.format(odai=odai)}] # モデル用の入力形式に変換
 
     boke_list = []
@@ -101,7 +102,7 @@ def generate_boke(number: int, odai: str) -> str:
     return boke_list
 
 # 推論エンドポイント
-@app.post("/boke_endpoint/", status_code=status.HTTP_201_CREATED)
+@app.post("/boke_endpoint", status_code=status.HTTP_201_CREATED)
 def boke_endpoint(request: Request) -> dict:
     try:
         boke_list = generate_boke(request.number, request.odai)

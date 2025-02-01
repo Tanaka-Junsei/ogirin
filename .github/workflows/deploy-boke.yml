@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 on:
   push:
     branches:
-      - 'cloud-run-boke'
+      - 'main'
     paths:
       - 'server/ml/boke/**'
 

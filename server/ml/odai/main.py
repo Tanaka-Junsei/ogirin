@@ -1,6 +1,5 @@
 import os
 import json
-import random
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from llama_cpp import Llama
@@ -8,7 +7,6 @@ from typing import List
 from google.cloud import storage
 from google.oauth2 import service_account
 from dotenv import load_dotenv
-from supabase import create_client
 
 # .env ファイルをロード
 load_dotenv()
@@ -27,9 +25,6 @@ GCS_LORA_MODEL_PATH = "generator/lora/3.7b-odai.gguf"
 LOCAL_LORA_MODEL_PATH = os.path.join(LOCAL_MODEL_DIR, "lora.gguf")
 
 GCP_SA_KEY = json.loads(os.getenv("GCP_SA_KEY"))
-
-# Supabase 設定
-supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 # モデル変数（後で初期化）
 model = None
@@ -87,34 +82,26 @@ class Request(BaseModel):
     number: int # 生成する応答の数
 
 # 応答取得関数
-def generate_odai(number: int) -> str:
+def generate_odai(number: int) -> List[str]:
     formatted_messages = [{"role": "user", "content": PROMPT}] # モデル用の入力形式に変換
 
     odai_list = []
-    while True:
+    for _ in range(number):
         response = model.create_chat_completion(
             messages=formatted_messages, 
             max_tokens=100, 
             temperature=1.2,
         )
         content = response["choices"][0]["message"]["content"]
-        if "大喜利" not in content:
-            odai_list.append({"text": content})
-        if len(odai_list) == number:
-            break
+        odai_list.append(content)
     
     return odai_list
 
-# supabase へのアップロード関数
-def upload_to_supabase(data: List[str]) -> None:
-    supabase.table("odai").insert(data).execute()
-
 # 推論エンドポイント
-@app.post("/reload_odai/", status_code=status.HTTP_201_CREATED)
-def reload_odai(request: Request) -> dict:
+@app.post("/odai_endpoint", status_code=status.HTTP_201_CREATED)
+def odai_endpoint(request: Request) -> dict:
     try:
         odai_list = generate_odai(request.number)
-        upload_to_supabase(odai_list)
-        return {"message": f"Successfully reloaded {request.number} odai to Supabase."}
+        return {"response": odai_list}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
