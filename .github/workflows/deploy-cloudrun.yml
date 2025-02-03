@@ -1,0 +1,86 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'server/cloudrun/odai/**'
+      - 'server/cloudrun/boke/**'
+
+jobs:
+  deploy_odai:
+    runs-on: ubuntu-22.04
+    if: contains(github.event.head_commit.modified, 'server/cloudrun/odai/') # odai ディレクトリの変更時に実行
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          install_components: gcloud
+          version: latest
+
+      - name: Build and push Docker image (odai)
+        run: |
+          gcloud builds submit \
+            --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
+            ./server/cloudrun/odai \
+            --gcs-log-dir=gs://ogirin-build-logs
+
+      - name: Deploy to Cloud Run (odai)
+        run: |
+          gcloud run deploy odai-service \
+            --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/odai-app-image \
+            --region ${{ secrets.GCP_REGION }} \
+            --allow-unauthenticated \
+            --timeout=3600s \
+            --max-instances=1 \
+            --memory=8Gi \
+            --cpu=2 \
+            --update-secrets=GCP_SA_KEY=GCP_SA_KEY:latest
+
+  deploy_boke:
+    runs-on: ubuntu-22.04
+    if: contains(github.event.head_commit.modified, 'server/cloudrun/boke/') # boke ディレクトリの変更時に実行
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          install_components: gcloud
+          version: latest
+
+      - name: Build and push Docker image (boke)
+        run: |
+          gcloud builds submit \
+            --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/boke-app-image \
+            ./server/cloudrun/boke \
+            --gcs-log-dir=gs://ogirin-build-logs
+
+      - name: Deploy to Cloud Run (boke)
+        run: |
+          gcloud run deploy boke-service \
+            --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/boke-app-image \
+            --region ${{ secrets.GCP_REGION }} \
+            --allow-unauthenticated \
+            --timeout=3600s \
+            --max-instances=1 \
+            --memory=24Gi \
+            --cpu=8 \
+            --update-secrets=GCP_SA_KEY=GCP_SA_KEY:latest

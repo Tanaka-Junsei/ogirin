@@ -1,0 +1,34 @@
+name: Deploy Supabase Edge Functions
+
+on:
+  push:
+    branches:
+      - main # `main` ブランチの変更をトリガー
+    paths:
+      - 'server/supabase/functions/reload_odai/**' # Edge Functionのコードが変更された場合のみ実行
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. リポジトリのコードをチェックアウト
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. Supabase CLIをセットアップ
+    - name: Setup Supabase CLI
+      run: curl -fsSL https://deb.supabase.com/install.sh | sh
+
+    # 3. Supabaseの環境変数を設定
+    - name: Set Supabase secrets
+      run: |
+        supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
+        supabase secrets set PROJECT_URL="${{ secrets.PROJECT_URL }}"
+        supabase secrets set ANON_KEY="${{ secrets.ANON_KEY }}"
+        supabase secrets set ODAI_API_URL="${{ secrets.ODAI_API_URL }}"
+        supabase secrets set SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+
+    # 4. Edge Functionsをデプロイ
+    - name: Deploy Edge Function to Supabase
+      run: supabase functions deploy generate_odai
