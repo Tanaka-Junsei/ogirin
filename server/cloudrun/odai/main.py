@@ -38,15 +38,16 @@ PROMPT = """
 ### 応答:
 """
 
+
 # GCS からモデルをダウンロードする関数
 def download_model_from_gcs() -> None:
     if not os.path.exists(LOCAL_MODEL_DIR):
         os.makedirs(LOCAL_MODEL_DIR)  # ディレクトリがなければ作成
-        
+
     credential = service_account.Credentials.from_service_account_info(GCP_SA_KEY)
     client = storage.Client(project=PROJECT_ID, credentials=credential)
     bucket = client.bucket(BUCKET_NAME)
-    
+
     if not os.path.exists(LOCAL_BASE_MODEL_PATH):  # ベースモデルがなければダウンロード
         blob = bucket.blob(GCS_BASE_MODEL_PATH)
         blob.download_to_filename(LOCAL_BASE_MODEL_PATH)
@@ -61,6 +62,7 @@ def download_model_from_gcs() -> None:
     else:
         print("LoRA Model already exists locally.")
 
+
 # FastAPI のイベントでモデルをロード
 @app.on_event("startup")
 def load_model():
@@ -72,30 +74,48 @@ def load_model():
     model = Llama(
         model_path=LOCAL_BASE_MODEL_PATH,
         lora_path=LOCAL_LORA_MODEL_PATH,
-        n_ctx=200, 
+        n_ctx=200,
         n_gpu_layers=-1,
     )
     print("Model loaded successfully.")
 
+
 # リクエストボディのスキーマ定義
 class Request(BaseModel):
-    number: int # 生成する応答の数
+    number: int  # 生成する応答の数
+
+
+# 不適切な単語を検出する関数
+def detect_bad_words(text: str) -> bool:
+    bad_words = ["大喜利", "お題"]
+    for word in bad_words:
+        if word in text:
+            return True
+    return False
+
 
 # 応答取得関数
 def generate_odai(number: int) -> List[str]:
-    formatted_messages = [{"role": "user", "content": PROMPT}] # モデル用の入力形式に変換
+    formatted_messages = [
+        {"role": "user", "content": PROMPT}
+    ]  # モデル用の入力形式に変換
 
+    index = 0
     odai_list = []
-    for _ in range(number):
+    while index < number:
         response = model.create_chat_completion(
-            messages=formatted_messages, 
-            max_tokens=100, 
+            messages=formatted_messages,
+            max_tokens=100,
             temperature=1.2,
         )
         content = response["choices"][0]["message"]["content"]
+        if detect_bad_words(content):
+            continue
         odai_list.append(content)
-    
+        index += 1
+
     return odai_list
+
 
 # 推論エンドポイント
 @app.post("/odai_endpoint", status_code=status.HTTP_201_CREATED)
