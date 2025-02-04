@@ -54,7 +54,7 @@ jobs:
       - name: Apply Database Migrations
         env:
           PGPASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: npx supabase db push
+        run: npx supabase db push --debug
         working-directory: server/supabase
 
   deploy_edge_function:
