@@ -11,10 +11,10 @@ on:
 jobs:
   deploy_odai:
     runs-on: ubuntu-22.04
-    if: >
-      ${{ contains(join(github.event.head_commit.added, ','), 'server/cloudrun/odai/')
-         || contains(join(github.event.head_commit.modified, ','), 'server/cloudrun/odai/')
-         || contains(join(github.event.head_commit.removed, ','), 'server/cloudrun/odai/') }}
+    # if: >
+    #   ${{ contains(join(github.event.head_commit.added, ','), 'server/cloudrun/odai/')
+    #      || contains(join(github.event.head_commit.modified, ','), 'server/cloudrun/odai/')
+    #      || contains(join(github.event.head_commit.removed, ','), 'server/cloudrun/odai/') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -52,10 +52,10 @@ jobs:
 
   deploy_boke:
     runs-on: ubuntu-22.04
-    if: >
-      ${{ contains(join(github.event.head_commit.added, ','), 'server/cloudrun/boke/')
-         || contains(join(github.event.head_commit.modified, ','), 'server/cloudrun/boke/')
-         || contains(join(github.event.head_commit.removed, ','), 'server/cloudrun/boke/') }}
+    # if: >
+    #   ${{ contains(join(github.event.head_commit.added, ','), 'server/cloudrun/boke/')
+    #      || contains(join(github.event.head_commit.modified, ','), 'server/cloudrun/boke/')
+    #      || contains(join(github.event.head_commit.removed, ','), 'server/cloudrun/boke/') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
