@@ -16,21 +16,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 2. Supabase CLI を npm 経由でインストール
-    - name: Install Supabase CLI
-      run: |
-        npm install -g supabase
-        echo "$(npm root -g)/supabase" >> $GITHUB_PATH
-
-    # 3. Supabase の環境変数を設定
+    # 2. Supabase の環境変数を設定（`npx` 経由で CLI を実行）
     - name: Set Supabase secrets
       run: |
-        supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
-        supabase secrets set PROJECT_URL="${{ secrets.PROJECT_URL }}"
-        supabase secrets set ANON_KEY="${{ secrets.ANON_KEY }}"
-        supabase secrets set ODAI_API_URL="${{ secrets.ODAI_API_URL }}"
-        supabase secrets set SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+        npx supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
+        npx supabase secrets set PROJECT_URL="${{ secrets.PROJECT_URL }}"
+        npx supabase secrets set ANON_KEY="${{ secrets.ANON_KEY }}"
+        npx supabase secrets set ODAI_API_URL="${{ secrets.ODAI_API_URL }}"
+        npx supabase secrets set SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
 
-    # 4. Edge Functions をデプロイ
+    # 3. Edge Functions をデプロイ（`npx` 経由）
     - name: Deploy Edge Function to Supabase
-      run: supabase functions deploy reload_odai --directory ./server/supabase/functions/reload_odai --watch
+      run: npx supabase functions deploy reload_odai --directory ./server/supabase/functions/reload_odai --watch
