@@ -35,12 +35,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      # - name: Set token env variable
-      #   run: echo "SUPABASE_ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
-      # - name: Authenticate Supabase CLI
-      #   run: echo -n "$SUPABASE_ACCESS_TOKEN" | npx supabase login --token -
       - name: Authenticate Supabase CLI
         run: npx supabase login --token ${{ secrets.ACCESS_TOKEN }}
+      - name: Link Supabase Project
+        run: npx supabase link --project-ref ${{ secrets.PROJECT_ID }}
       - name: Apply Database Migrations
         run: npx supabase db push
 
@@ -52,15 +50,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      # - name: Set token env variable
-      #   run: echo "SUPABASE_ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
-      # - name: Authenticate Supabase CLI
-      #   run: echo -n "$SUPABASE_ACCESS_TOKEN" | npx supabase login --token -
       - name: Authenticate Supabase CLI
         run: npx supabase login --token ${{ secrets.ACCESS_TOKEN }}
+      - name: Link Supabase Project
+        run: npx supabase link --project-ref ${{ secrets.PROJECT_ID }}
       - name: Set Supabase secrets
         run: |
-          npx supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
           npx supabase secrets set PROJECT_URL="${{ secrets.PROJECT_URL }}"
           npx supabase secrets set ANON_KEY="${{ secrets.ANON_KEY }}"
           npx supabase secrets set ODAI_API_URL="${{ secrets.ODAI_API_URL }}"
