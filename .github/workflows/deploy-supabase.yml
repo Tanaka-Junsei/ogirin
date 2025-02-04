@@ -3,29 +3,29 @@ name: Deploy Supabase Edge Functions
 on:
   push:
     branches:
-      - edge-functions # `edge-functions` ブランチの変更をトリガー
+      - edge-functions
     paths:
-      - 'server/supabase/functions/reload-odai/**' # Edge Functionのコードが変更された場合のみ実行
+      - 'server/supabase/functions/reload-odai/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. リポジトリのコードをチェックアウト
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 2. Supabase の環境変数を設定（`npx` 経由で CLI を実行）
+    - name: Authenticate Supabase CLI
+      run: |
+        echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
+
     - name: Set Supabase secrets
       run: |
-        npx supabase secrets set SUPABASE_ACCESS_TOKEN="${{ secrets.SUPABASE_ACCESS_TOKEN }}"
         npx supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
         npx supabase secrets set PROJECT_URL="${{ secrets.PROJECT_URL }}"
         npx supabase secrets set ANON_KEY="${{ secrets.ANON_KEY }}"
         npx supabase secrets set ODAI_API_URL="${{ secrets.ODAI_API_URL }}"
         npx supabase secrets set SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
 
-    # 3. Edge Functions をデプロイ（`npx` 経由）
     - name: Deploy Edge Function to Supabase
-      run: npx supabase functions deploy reload_odai --directory ./server/supabase/functions/reload_odai --watch
+      run: npx supabase functions deploy reload_odai --directory ./server/supabase/functions/reload_odai
