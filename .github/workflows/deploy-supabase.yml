@@ -36,7 +36,7 @@ jobs:
     name: Apply Database Migrations
     runs-on: ubuntu-latest
     needs: filter
-    if: ${{ needs.filter.outputs.migrations == 'true' }}
+    if: ${{ fromJSON(needs.filter.outputs.migrations) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -62,7 +62,7 @@ jobs:
     name: Deploy Edge Function
     runs-on: ubuntu-latest
     needs: filter
-    if: ${{ needs.filter.outputs.functions == 'true' }}
+    if: ${{ fromJSON(needs.filter.outputs.functions) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
