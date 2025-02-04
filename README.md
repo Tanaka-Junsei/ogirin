@@ -15,7 +15,7 @@
 flowchart TB
   node_1["Cloud Run"]
   node_2["Supabase Edge Functions"]
-  node_3["Vercel"]
+  node_3["Supabase Database"]
   node_1 --"お題を生成"--> node_2
   node_2 --"生成リクエストを送信"--> node_1
   node_2 --"DBに生成お題を登録"--> node_3
