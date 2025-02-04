@@ -42,6 +42,8 @@ jobs:
         run: npx supabase link --project-ref ${{ secrets.PROJECT_ID }}
         working-directory: server/supabase
       - name: Apply Database Migrations
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
         run: npx supabase db push
         working-directory: server/supabase
 
@@ -67,5 +69,5 @@ jobs:
           npx supabase secrets set SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
         working-directory: server/supabase
       - name: Deploy Edge Function to Supabase
-        run: npx supabase functions deploy functions_odai --directory ./server/supabase/functions/reload-odai
-        working-directory: server/supabase
+        run: npx supabase functions deploy functions_odai
+        working-directory: server/supabase/functions/reload-odai
