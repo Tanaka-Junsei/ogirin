@@ -20,7 +20,8 @@ jobs:
     - name: Setup Supabase CLI
       run: |
         curl -fsSL https://deb.supabase.com/install.sh | sh
-        echo "$HOME/.supabase/bin" >> $GITHUB_PATH
+        export PATH="$HOME/.supabase/bin:$PATH"
+        echo "PATH=$HOME/.supabase/bin:$PATH" >> $GITHUB_ENV
 
     # 3. Supabaseの環境変数を設定
     - name: Set Supabase secrets
