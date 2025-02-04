@@ -3,7 +3,7 @@ name: Deploy Supabase Changes
 on:
   push:
     branches:
-      - edge-functions  # Edge Functions & Database Functions のブランチ
+      - 'edge-functions'  # Edge Functions & Database Functions のブランチ
     paths:
       - 'server/supabase/functions/reload-odai/**'  # Edge Functions
       - 'server/supabase/migrations/**'  # Database Migrations
@@ -12,7 +12,7 @@ jobs:
   # データベースマイグレーションの適用
   apply_migrations:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'server/supabase/migrations')  # マイグレーションの変更時に実行
+    if: contains(github.event.head_commit.modified, 'server/supabase/migrations/')  # マイグレーションの変更時に実行
 
     steps:
     - name: Checkout code
@@ -28,7 +28,7 @@ jobs:
   # Edge Functions のデプロイ
   deploy_edge_function:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'server/supabase/functions/reload-odai')  # Edge Functions の変更時に実行
+    if: contains(github.event.head_commit.modified, 'server/supabase/functions/reload-odai/')  # Edge Functions の変更時に実行
 
     steps:
     - name: Checkout code
