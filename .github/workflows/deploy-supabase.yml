@@ -25,9 +25,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set token env variable
-        run: echo "SUPABASE_ACCESS_TOKEN=${{ secrets.SUPABASE_ACCESS_TOKEN }}" >> $GITHUB_ENV
-        
+      - name: Debug: Print token length
+        run: echo "Token length: ${#SUPABASE_ACCESS_TOKEN}"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
       - name: Authenticate Supabase CLI
         run: |
           echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
@@ -50,6 +52,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Debug: Print token length
+        run: echo "Token length: ${#SUPABASE_ACCESS_TOKEN}"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Authenticate Supabase CLI
         run: |
