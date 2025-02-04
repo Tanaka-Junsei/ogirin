@@ -65,7 +65,7 @@ serve(async (req) => {
       });
     }
 
-    // SupabaseのDBにお題を一括挿入
+    // SupabaseのDBにお題を一括挿入 
     const insertData = odaiData.response.map((odaiText) => ({ text: odaiText }));
     console.log("Inserting into Supabase:", insertData);
 

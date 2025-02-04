@@ -18,7 +18,9 @@ jobs:
 
     # 2. Supabase CLIをセットアップ
     - name: Setup Supabase CLI
-      run: curl -fsSL https://deb.supabase.com/install.sh | sh
+      run: |
+        curl -fsSL https://deb.supabase.com/install.sh | sh
+        echo "$HOME/.supabase/bin" >> $GITHUB_PATH
 
     # 3. Supabaseの環境変数を設定
     - name: Set Supabase secrets
