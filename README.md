@@ -10,7 +10,7 @@
 
 
 ## 構成図
-
+### お題生成
 ```mermaid
 flowchart TB
   node_1["Cloud Run"]
@@ -19,7 +19,10 @@ flowchart TB
   node_1 --"お題を生成"--> node_2
   node_2 --"生成リクエストを送信"--> node_1
   node_2 --"DBに生成お題を登録"--> node_3
+```
 
+### お題取得
+```mermaid
 flowchart TB
   node_1["Vercel"]
   node_2["Supabase Database Functions"]
