@@ -5,63 +5,53 @@ on:
     branches:
       - edge-functions
     paths:
-      - 'server/supabase/functions/reload-odai/**'  # Edge Functions
-      - 'server/supabase/migrations/**'            # Database Migrations
+      - 'server/supabase/functions/**'
+      - 'server/supabase/migrations/**'
 
 jobs:
+  filter:
+    name: Filter Changed Paths
+    runs-on: ubuntu-latest
+    outputs:
+      migrations: ${{ steps.filter.outputs.migrations }}
+      functions: ${{ steps.filter.outputs.functions }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            migrations:
+              - 'server/supabase/migrations/**'
+            functions:
+              - 'server/supabase/functions/**'
+
   apply_migrations:
     name: Apply Database Migrations
     runs-on: ubuntu-latest
-    # このジョブは、migrations 以下に変更があった場合のみ実行
-    if: >
-      ${{ github.event.head_commit &&
-          (
-            contains(join(github.event.head_commit.added, ','), 'server/supabase/migrations/') ||
-            contains(join(github.event.head_commit.modified, ','), 'server/supabase/migrations/') ||
-            contains(join(github.event.head_commit.removed, ','), 'server/supabase/migrations/')
-          )
-      }}
+    needs: filter
+    if: ${{ needs.filter.outputs.migrations == 'true' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Debug: Print token length
-        run: echo "Token length: ${#SUPABASE_ACCESS_TOKEN}"
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
+      - name: Set token env variable
+        run: echo "SUPABASE_ACCESS_TOKEN=${{ secrets.SUPABASE_ACCESS_TOKEN }}" >> $GITHUB_ENV
       - name: Authenticate Supabase CLI
-        run: |
-          echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
-
+        run: echo "$SUPABASE_ACCESS_TOKEN" | npx supabase login --token -
       - name: Apply Database Migrations
         run: npx supabase db push
 
   deploy_edge_function:
     name: Deploy Edge Function
     runs-on: ubuntu-latest
-    # このジョブは、reload-odai 以下に変更があった場合のみ実行
-    if: >
-      ${{ github.event.head_commit &&
-          (
-            contains(join(github.event.head_commit.added, ','), 'server/supabase/functions/reload-odai/') ||
-            contains(join(github.event.head_commit.modified, ','), 'server/supabase/functions/reload-odai/') ||
-            contains(join(github.event.head_commit.removed, ','), 'server/supabase/functions/reload-odai/')
-          )
-      }}
+    needs: filter
+    if: ${{ needs.filter.outputs.functions == 'true' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Debug: Print token length
-        run: echo "Token length: ${#SUPABASE_ACCESS_TOKEN}"
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
       - name: Authenticate Supabase CLI
-        run: |
-          echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
-
+        run: echo "$SUPABASE_ACCESS_TOKEN" | npx supabase login --token -
       - name: Set Supabase secrets
         run: |
           npx supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
@@ -69,6 +59,5 @@ jobs:
           npx supabase secrets set ANON_KEY="${{ secrets.ANON_KEY }}"
           npx supabase secrets set ODAI_API_URL="${{ secrets.ODAI_API_URL }}"
           npx supabase secrets set SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
-
       - name: Deploy Edge Function to Supabase
-        run: npx supabase functions deploy reload_odai --directory ./server/supabase/functions/reload-odai
+        run: npx supabase functions deploy functions_odai --directory ./server/supabase/functions/reload-odai
