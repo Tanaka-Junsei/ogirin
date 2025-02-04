@@ -39,6 +39,11 @@ PROMPT = """
 """
 
 
+# リクエストボディのスキーマ定義
+class Request(BaseModel):
+    number: int  # 生成する応答の数
+
+
 # GCS からモデルをダウンロードする関数
 def download_model_from_gcs() -> None:
     if not os.path.exists(LOCAL_MODEL_DIR):
@@ -62,6 +67,7 @@ def download_model_from_gcs() -> None:
     else:
         print("LoRA Model already exists locally.")
 
+
 # FastAPI のイベントでモデルをロード
 @app.on_event("startup")
 def load_model():
@@ -78,9 +84,6 @@ def load_model():
     )
     print("Model loaded successfully.")
 
-# リクエストボディのスキーマ定義
-class Request(BaseModel):
-    number: int  # 生成する応答の数
 
 # 不適切な単語を検出する関数
 def detect_bad_words(text: str) -> bool:
@@ -89,6 +92,7 @@ def detect_bad_words(text: str) -> bool:
         if word in text:
             return True
     return False
+
 
 # 応答取得関数
 def generate_odai(number: int) -> List[str]:
@@ -111,6 +115,7 @@ def generate_odai(number: int) -> List[str]:
         index += 1
 
     return odai_list
+
 
 # 推論エンドポイント
 @app.post("/odai_endpoint", status_code=status.HTTP_201_CREATED)
