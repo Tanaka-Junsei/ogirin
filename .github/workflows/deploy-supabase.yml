@@ -3,7 +3,7 @@ name: Deploy Supabase Edge Functions
 on:
   push:
     branches:
-      - edge-functions # `main` ブランチの変更をトリガー
+      - edge-function # `main` ブランチの変更をトリガー
     paths:
       - 'server/supabase/functions/reload_odai/**' # Edge Functionのコードが変更された場合のみ実行
 
