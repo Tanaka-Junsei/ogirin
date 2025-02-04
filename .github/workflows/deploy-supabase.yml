@@ -35,18 +35,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Token length
-        run: echo "${#SUPABASE_ACCESS_TOKEN}"
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-
-      - name: Set token env variable
-        run: echo "SUPABASE_ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
       - name: Authenticate Supabase CLI
-        run: echo -n "$SUPABASE_ACCESS_TOKEN" | npx supabase login --token -
-      # - name: Authenticate Supabase CLI
-      #   run: echo ${{ secrets.ACCESS_TOKEN }} | npx supabase login --token -
+        run: printf '%s' "${{ secrets.ACCESS_TOKEN }}" | npx supabase login --token -
       - name: Apply Database Migrations
         run: npx supabase db push
 
@@ -58,12 +48,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Set token env variable
-        run: echo "SUPABASE_ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
       - name: Authenticate Supabase CLI
-        run: echo -n "$SUPABASE_ACCESS_TOKEN" | npx supabase login --token -
-      # - name: Authenticate Supabase CLI
-      #   run: echo ${{ secrets.ACCESS_TOKEN }} | npx supabase login --token -
+        run: printf '%s' "${{ secrets.ACCESS_TOKEN }}" | npx supabase login --token -
       - name: Set Supabase secrets
         run: |
           npx supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
