@@ -25,7 +25,7 @@ jobs:
             migrations:
               - 'server/supabase/migrations/**'
             functions:
-              - 'server/supabase/functions/**'
+              - 'server/supabase/functions/reload-odai/**'
 
   apply_migrations:
     name: Apply Database Migrations
@@ -38,8 +38,8 @@ jobs:
       - name: Authenticate Supabase CLI
         run: npx supabase login --token ${{ secrets.ACCESS_TOKEN }}
         working-directory: server/supabase
-      - name: Remove old config.toml
-        run: rm -f config.toml
+      - name: Initialize Supabase project configuration
+        run: npx supabase init --non-interactive
         working-directory: server/supabase
       - name: Link Supabase Project
         run: npx supabase link --project-ref ${{ secrets.PROJECT_ID }}
