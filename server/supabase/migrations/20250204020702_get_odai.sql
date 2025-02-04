@@ -1,3 +1,5 @@
+-- お題を取得する関数
+-- view_count が最小で、かつ created_at が最も古いお題を取得し、view_count をインクリメントする
 create or replace function get_odai()
 returns table(id uuid, text text, created_at timestamp, view_count int)
 language sql
