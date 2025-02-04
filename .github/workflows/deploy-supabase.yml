@@ -25,6 +25,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set token env variable
+        run: echo "SUPABASE_ACCESS_TOKEN=${{ secrets.SUPABASE_ACCESS_TOKEN }}" >> $GITHUB_ENV
+        
       - name: Authenticate Supabase CLI
         run: |
           echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
