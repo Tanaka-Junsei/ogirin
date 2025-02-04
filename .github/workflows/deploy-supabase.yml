@@ -35,8 +35,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
-      - name: Debug: Token length
+
+      - name: Token length
         run: echo "Token length: ${#SUPABASE_ACCESS_TOKEN}"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
