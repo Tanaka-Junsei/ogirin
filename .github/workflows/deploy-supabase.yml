@@ -40,7 +40,7 @@ jobs:
       # - name: Authenticate Supabase CLI
       #   run: echo "$SUPABASE_ACCESS_TOKEN" | npx supabase login --token -
       - name: Authenticate Supabase CLI
-        run: echo ${{ secrets.SUPABASE_ACCESS_TOKEN }} | npx supabase login --token -
+        run: echo ${{ secrets.ACCESS_TOKEN }} | npx supabase login --token -
       - name: Apply Database Migrations
         run: npx supabase db push
 
@@ -57,7 +57,7 @@ jobs:
       # - name: Authenticate Supabase CLI
       #   run: echo "$SUPABASE_ACCESS_TOKEN" | npx supabase login --token -
       - name: Authenticate Supabase CLI
-        run: echo ${{ secrets.SUPABASE_ACCESS_TOKEN }} | npx supabase login --token -
+        run: echo ${{ secrets.ACCESS_TOKEN }} | npx supabase login --token -
       - name: Set Supabase secrets
         run: |
           npx supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
