@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 on:
   push:
     branches:
-      - 'main'
+      - main
     paths:
       - 'server/cloudrun/odai/**'
       - 'server/cloudrun/boke/**'
@@ -11,9 +11,12 @@ on:
 jobs:
   deploy_odai:
     runs-on: ubuntu-22.04
-    if: contains(github.event.head_commit.modified, 'server/cloudrun/odai/') # odai ディレクトリの変更時に実行
+    if: >
+      ${{ contains(join(github.event.head_commit.added, ','), 'server/cloudrun/odai/')
+         || contains(join(github.event.head_commit.modified, ','), 'server/cloudrun/odai/')
+         || contains(join(github.event.head_commit.removed, ','), 'server/cloudrun/odai/') }}
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Authenticate to Google Cloud
@@ -49,9 +52,12 @@ jobs:
 
   deploy_boke:
     runs-on: ubuntu-22.04
-    if: contains(github.event.head_commit.modified, 'server/cloudrun/boke/') # boke ディレクトリの変更時に実行
+    if: >
+      ${{ contains(join(github.event.head_commit.added, ','), 'server/cloudrun/boke/')
+         || contains(join(github.event.head_commit.modified, ','), 'server/cloudrun/boke/')
+         || contains(join(github.event.head_commit.removed, ','), 'server/cloudrun/boke/') }}
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Authenticate to Google Cloud

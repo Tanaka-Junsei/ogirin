@@ -3,43 +3,62 @@ name: Deploy Supabase Changes
 on:
   push:
     branches:
-      - 'edge-functions'  # Edge Functions & Database Functions のブランチ
+      - edge-functions
+    paths:
+      - 'server/supabase/functions/reload-odai/**'  # Edge Functions
+      - 'server/supabase/migrations/**'            # Database Migrations
 
 jobs:
-  # データベースマイグレーションの適用
   apply_migrations:
+    name: Apply Database Migrations
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'  # `push` イベント時のみ実行
+    # このジョブは、migrations 以下に変更があった場合のみ実行
+    if: >
+      ${{ github.event.head_commit &&
+          (
+            contains(join(github.event.head_commit.added, ','), 'server/supabase/migrations/') ||
+            contains(join(github.event.head_commit.modified, ','), 'server/supabase/migrations/') ||
+            contains(join(github.event.head_commit.removed, ','), 'server/supabase/migrations/')
+          )
+      }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Authenticate Supabase CLI
-      run: |
-        echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
+      - name: Authenticate Supabase CLI
+        run: |
+          echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
 
-    - name: Apply Database Migrations
-      run: npx supabase db push
+      - name: Apply Database Migrations
+        run: npx supabase db push
 
-  # Edge Functions のデプロイ
   deploy_edge_function:
+    name: Deploy Edge Function
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'  # `push` イベント時のみ実行
+    # このジョブは、reload-odai 以下に変更があった場合のみ実行
+    if: >
+      ${{ github.event.head_commit &&
+          (
+            contains(join(github.event.head_commit.added, ','), 'server/supabase/functions/reload-odai/') ||
+            contains(join(github.event.head_commit.modified, ','), 'server/supabase/functions/reload-odai/') ||
+            contains(join(github.event.head_commit.removed, ','), 'server/supabase/functions/reload-odai/')
+          )
+      }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Authenticate Supabase CLI
-      run: |
-        echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
+      - name: Authenticate Supabase CLI
+        run: |
+          echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" | npx supabase login --token -
 
-    - name: Set Supabase secrets
-      run: |
-        npx supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
-        npx supabase secrets set PROJECT_URL="${{ secrets.PROJECT_URL }}"
-        npx supabase secrets set ANON_KEY="${{ secrets.ANON_KEY }}"
-        npx supabase secrets set ODAI_API_URL="${{ secrets.ODAI_API_URL }}"
-        npx supabase secrets set SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+      - name: Set Supabase secrets
+        run: |
+          npx supabase secrets set PROJECT_ID="${{ secrets.PROJECT_ID }}"
+          npx supabase secrets set PROJECT_URL="${{ secrets.PROJECT_URL }}"
+          npx supabase secrets set ANON_KEY="${{ secrets.ANON_KEY }}"
+          npx supabase secrets set ODAI_API_URL="${{ secrets.ODAI_API_URL }}"
+          npx supabase secrets set SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
 
-    - name: Deploy Edge Function to Supabase
-      run: npx supabase functions deploy reload_odai --directory ./server/supabase/functions/reload-odai
+      - name: Deploy Edge Function to Supabase
+        run: npx supabase functions deploy reload_odai --directory ./server/supabase/functions/reload-odai
