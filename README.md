@@ -15,13 +15,18 @@
 flowchart TB
   node_1["Cloud Run"]
   node_2["Supabase Edge Functions"]
-  node_3["Supabase Database"]
-  node_4["Vercel"]
-  node_4 --"補充リクエストを送信"--> node_2
-  node_2 --"生成リクエストを送信"--> node_1
+  node_3["Vercel"]
   node_1 --"お題を生成"--> node_2
-  node_2 --"DBにお題を登録"--> node_3
-  node_4 --"お題を取得"--> node_2
+  node_2 --"生成リクエストを送信"--> node_1
+  node_2 --"DBに生成お題を登録"--> node_3
+
+flowchart TB
+  node_1["Vercel"]
+  node_2["Supabase Database Functions"]
+  node_3["Supabase Database"]
+  node_1 --"取得リクエストを送信"--> node_2
+  node_3 --"DBから生成お題を取得"--> node_2
+  node_2 --"お題を送信"--> node_1
 ```
 
 ## 詳細
@@ -31,9 +36,12 @@ flowchart TB
 - LLMによるお題生成を実行
 
 ### Supabase Edge Functions
-- Vercelからリクエストを受け取り、Cloud Runにお題生成リクエストを送信
+- Cloud Runにお題生成リクエストを定期送信
 - Cloud RunからのレスポンスをSupabase Databaseに登録
-- お題の各種前処理を行う
+
+### Supabase Database Functions
+- Vercelからリクエストを受け取り、Supabase Databaseからお題を取得
+- お題をVercelに返却
 
 ### Supabase Database
 - PostgreSQL Databaseでお題を管理

@@ -3,7 +3,7 @@ name: Apply Database Migrations
 on:
   push:
     branches:
-      - edge-functions
+      - main
     paths:
       - 'server/supabase/migrations/**'
 

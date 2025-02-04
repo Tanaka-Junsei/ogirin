@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 on:
   push:
     branches:
-      - edge-functions
+      - main
     paths:
       - 'server/cloudrun/odai/**'
       - 'server/cloudrun/boke/**'
