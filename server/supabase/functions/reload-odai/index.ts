@@ -29,9 +29,6 @@ serve(async (req) => {
     // リクエストヘッダーから生成件数を取得（デフォルト: 1）
     const { number } = await req.json().catch(() => ({ number: 1 }));
 
-    const requestData = await req.json();
-    console.log("Request data:", requestData); // ここでログ出力
-
     if (!number || typeof number !== "number" || number <= 0) {
       return new Response(JSON.stringify({ error: "Invalid 'number' value" }), {
         status: 400,
