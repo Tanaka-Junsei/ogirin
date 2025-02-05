@@ -30,6 +30,7 @@ serve(async (req) => {
     const { number } = await req.json().catch(() => ({ number: 1 }));
 
     const requestData = await req.json().catch(() => ({ number: 1 }));
+    console.log("req", req);
     console.log("Received request data:", requestData);
     console.log("Extracted number:", requestData.number);
 
